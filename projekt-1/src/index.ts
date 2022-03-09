@@ -1,12 +1,31 @@
 const express = require("express");
 const app = express();
-app.get("/", (req, res) => {
-  const num1 = +req.query.num1;
-  const num2 = +req.query.num2;
-  const sum = num1 + num2;
-  res.send(sum.toString());
+app.get("/:operation/:num1/:num2", (req, res) => {
+  const num1 = +req.params.num1;
+  const num2 = +req.params.num2;
+  const operation = req.params.operation;
+  let result =
+    "Use correct path: operation/number1/number2. Operation = (add/subtract/multiply/divide)";
+  let sign = "";
+  switch (operation) {
+    case "add":
+      sign = "+";
+      result = `${num1} + ${num2} = ${num1 + num2}`;
+      break;
+    case "subtract":
+      result = `${num1} - ${num2} = ${num1 - num2}`;
+      break;
+    case "divide":
+      result = `${num1} / ${num2} = ${(num1 / num2).toFixed(2)}`;
+      break;
+    case "multiply":
+      result = `${num1} * ${num2} = ${num1 * num2}`;
+      break;
+    default:
+      break;
+  }
 
-  //   req.params = { operation: "add", bookId: "8989" };
-  //   res.send(req.params);
+  res.send(result.toString());
 });
+
 app.listen(3000);
