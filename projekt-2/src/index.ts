@@ -11,6 +11,16 @@ function createNote(title: string, content: string, tags?: string[]): Note {
   const id = Date.now();
   return new Note(title, content, createDate, tags, id);
 }
+function updateNote(
+  newTitle: string,
+  newContent: string,
+  id: number,
+  tags?: string[]
+): Note {
+  const date = new Date(Date.now());
+  const createDate = date.toISOString();
+  return new Note(newTitle, newContent, createDate, tags, id);
+}
 
 // Routing
 const app = express();
@@ -37,10 +47,15 @@ app.get("/notes", function (req: Request, res: Response) {
 });
 
 app.put("/note/:id", function (req: Request, res: Response) {
-  const note = notes.find((n) => n.id === +req.params.id);
-  const noteJSON = JSON.stringify(note);
-  if (res.status(200)) res.send(note);
-  else res.sendStatus(404);
+  const index = +req.params.id;
+  const noteIndex: number = notes.findIndex((n) => n.id === index);
+  if (noteIndex !== -1) {
+    const title = "Updated Title";
+    const content = "Updated content";
+
+    notes[noteIndex] = updateNote(title, content, index);
+    res.sendStatus(201);
+  } else res.sendStatus(404);
 });
 
 app.delete("/note/:id", function (req: Request, res: Response) {
