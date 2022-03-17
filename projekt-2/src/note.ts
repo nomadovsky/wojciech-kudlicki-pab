@@ -4,6 +4,7 @@ export class Note {
   createDate?: string;
   tags?: string[];
   id?: number;
+
   constructor(
     title: string,
     content: string,
@@ -16,12 +17,5 @@ export class Note {
     this.tags = tags;
     this.createDate = createDate;
     this.id = id;
-  }
-
-  createNote(title: string, content: string, tags?: string[]): Note {
-    const date = new Date(Date.now());
-    this.createDate = date.toISOString();
-    this.id = Date.now();
-    return new Note(title, content, this.createDate);
   }
 }
