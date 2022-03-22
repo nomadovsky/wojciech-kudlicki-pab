@@ -1,26 +1,9 @@
 import express from "express";
 import { Request, Response } from "express";
-import { Note } from "./note";
+import { Note, createNote, updateNote } from "./note";
 
 // Notes
 let notes: Note[] = [];
-
-function createNote(title: string, content: string, tags?: string[]): Note {
-  const date = new Date(Date.now());
-  const createDate = date.toISOString();
-  const id = Date.now();
-  return new Note(title, content, createDate, tags, id);
-}
-function updateNote(
-  newTitle: string,
-  newContent: string,
-  id: number,
-  tags?: string[]
-): Note {
-  const date = new Date(Date.now());
-  const createDate = date.toISOString();
-  return new Note(newTitle, newContent, createDate, tags, id);
-}
 
 // Routing
 const app = express();
@@ -28,7 +11,7 @@ const app = express();
 app.use(express.json());
 
 app.post("/note", function (req: Request, res: Response) {
-  const note = createNote("New Title1", "Content1");
+  const note = createNote(req.body);
   notes.push(note);
   if (res.status(201)) res.send(`201 Note ID: ${note.id}`);
   else res.sendStatus(400);
@@ -50,10 +33,7 @@ app.put("/note/:id", function (req: Request, res: Response) {
   const index = +req.params.id;
   const noteIndex: number = notes.findIndex((n) => n.id === index);
   if (noteIndex !== -1) {
-    const title = "Updated Title";
-    const content = "Updated content";
-
-    notes[noteIndex] = updateNote(title, content, index);
+    notes[noteIndex] = updateNote(req.body, index);
     res.sendStatus(201);
   } else res.sendStatus(404);
 });
