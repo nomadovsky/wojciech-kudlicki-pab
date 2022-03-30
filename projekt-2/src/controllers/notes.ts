@@ -1,13 +1,12 @@
 import { RequestHandler } from "express";
-import { readNotesFromFile, updateNotesFromFile } from "../fileOperations";
+import { readFromFile, updateFile } from "../fileOperations";
 import { Note } from "../models/note";
 import { addTag } from "../controllers/tags";
-import { createTags } from "./tags";
 
 const NOTES_PATH = "data/notes.json";
 
 export const getNote: RequestHandler = async (req, res, next) => {
-  const notes = await readNotesFromFile(NOTES_PATH);
+  const notes = await readFromFile<Note>(NOTES_PATH);
   const note = notes.find((n) => n.id === +req.params.id);
   const noteJSON = JSON.stringify(note);
   if (note) res.status(200).send(`200 ${noteJSON}`);
@@ -15,12 +14,12 @@ export const getNote: RequestHandler = async (req, res, next) => {
 };
 
 export const getAllNotes: RequestHandler = async (req, res, next) => {
-  const notes = await readNotesFromFile(NOTES_PATH);
+  const notes = await readFromFile<Note>(NOTES_PATH);
   res.status(200) ? res.send(notes) : res.sendStatus(400);
 };
 
 export const createNote: RequestHandler = async (req, res, next) => {
-  const notes = await readNotesFromFile(NOTES_PATH);
+  const notes = await readFromFile<Note>(NOTES_PATH);
 
   const date = new Date(Date.now());
   const note = req.body;
@@ -33,7 +32,7 @@ export const createNote: RequestHandler = async (req, res, next) => {
   };
   if (res.status(201)) {
     res.send(`201 Note ID: ${newNote.id}`);
-    await updateNotesFromFile(NOTES_PATH, [...notes, newNote]);
+    await updateFile<Note>(NOTES_PATH, [...notes, newNote]);
     if (newNote.tags) {
       newNote.tags.forEach((tag) => addTag(tag));
     }
@@ -53,22 +52,26 @@ const updatedNote = (note: Note, noteId: number) => {
 };
 
 export const updateNote: RequestHandler = async (req, res) => {
-  const notes = await readNotesFromFile(NOTES_PATH);
+  const notes = await readFromFile(NOTES_PATH);
 
   const index = +req.params.id;
   const noteIndex: number = notes.findIndex((n) => n.id === index);
   if (noteIndex !== -1) {
-    notes[noteIndex] = updatedNote(req.body, index);
+    const newNote = updatedNote(req.body, index);
+    notes[noteIndex] = newNote;
+    if (newNote.tags) {
+      newNote.tags.forEach((tag) => addTag(tag));
+    }
     res.sendStatus(201);
   } else res.sendStatus(404);
 };
 
 export const deleteNote: RequestHandler = async (req, res) => {
-  const notes = await readNotesFromFile(NOTES_PATH);
+  const notes = await readFromFile<Note>(NOTES_PATH);
   const note = notes.find((n: Note) => n.id === +req.params.id);
   if (note) {
     const newNotes = notes.filter((n: Note) => n.id !== +req.params.id);
-    updateNotesFromFile("./data/notes.json", newNotes);
+    updateFile<Note>(NOTES_PATH, newNotes);
     res.sendStatus(204);
   } else res.sendStatus(400);
 };

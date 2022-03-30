@@ -1,12 +1,11 @@
 import { RequestHandler } from "express";
-import { isNullOrUndefined } from "util";
-import { readTagsFromFile, updateTagsFromFile } from "../fileOperations";
+import { readFromFile, updateFile } from "../fileOperations";
 import { Tag } from "../models/tag";
 
 const TAGS_PATH = "data/tags.json";
 
 export const getTag: RequestHandler = async (req, res, next) => {
-  const tags = await readTagsFromFile(TAGS_PATH);
+  const tags = await readFromFile(TAGS_PATH);
   const tag = tags.find((n) => n.id === +req.params.id);
   const tagJSON = JSON.stringify(tag);
   if (tag) res.status(200).send(`200 ${tagJSON}`);
@@ -14,13 +13,13 @@ export const getTag: RequestHandler = async (req, res, next) => {
 };
 
 export const getAllTags: RequestHandler = async (req, res, next) => {
-  const tags = await readTagsFromFile(TAGS_PATH);
+  const tags = await readFromFile(TAGS_PATH);
   res.status(200) ? res.send(tags) : res.sendStatus(400);
 };
 
 export const addTag = async (tag: Tag) => {
   if (tag.name === undefined) return;
-  const tags = await readTagsFromFile(TAGS_PATH);
+  const tags = await readFromFile<Tag>(TAGS_PATH);
   if (tags.some((t) => t.name.toLowerCase() === tag.name.toLowerCase())) {
     return;
   } else {
@@ -28,7 +27,7 @@ export const addTag = async (tag: Tag) => {
       id: tag.id ?? Date.now(),
       name: tag.name,
     };
-    await updateTagsFromFile(TAGS_PATH, [...tags, newTag]);
+    await updateFile(TAGS_PATH, [...tags, newTag]);
     return newTag;
   }
 };
@@ -50,7 +49,7 @@ const updatedTag = (tag: Tag, tagId: number) => {
 };
 
 export const updateTags: RequestHandler = async (req, res) => {
-  const tags = await readTagsFromFile(TAGS_PATH);
+  const tags = await readFromFile(TAGS_PATH);
 
   const index = +req.params.id;
   const tagIndex: number = tags.findIndex((n) => n.id === index);
@@ -61,12 +60,12 @@ export const updateTags: RequestHandler = async (req, res) => {
 };
 
 export const deleteTag: RequestHandler = async (req, res) => {
-  const tags = await readTagsFromFile(TAGS_PATH);
+  const tags = await readFromFile<Tag>(TAGS_PATH);
 
   const tag = tags.find((n: Tag) => n.id === +req.params.id);
   if (tag) {
     const newTags = tags.filter((n: Tag) => n.id !== +req.params.id);
-    updateTagsFromFile("./data/tags.json", newTags);
+    updateFile("./data/tags.json", newTags);
     res.sendStatus(204);
   } else res.sendStatus(400);
 };
