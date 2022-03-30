@@ -1,6 +1,7 @@
-import { Note } from "./note";
+import { Note } from "./models/note";
 
 import fs from "fs";
+import { Tag } from "./models/tag";
 
 export async function readStorage(file: string): Promise<void> {
   try {
@@ -12,7 +13,7 @@ export async function readStorage(file: string): Promise<void> {
 
 export async function updateStorage(
   storeFile: string,
-  dataToSave: Note
+  dataToSave: Note | Tag[] | undefined
 ): Promise<void> {
   try {
     await fs.promises.writeFile(storeFile, JSON.stringify(dataToSave));
