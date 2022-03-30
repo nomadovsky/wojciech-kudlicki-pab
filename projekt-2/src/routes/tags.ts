@@ -1,9 +1,8 @@
 import { Router } from "express";
+import { getAllTags } from "../controllers/tags";
 
 const router = Router();
 
-router.get("/", function (req, res) {
-  res.send("Tags page");
-});
+router.get("/", getAllTags);
 
 export default router;

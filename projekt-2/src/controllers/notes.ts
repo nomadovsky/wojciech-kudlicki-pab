@@ -1,22 +1,27 @@
 import { RequestHandler } from "express";
-import { readStorage, updateStorage } from "../fileOperations";
+import { readNotesFromFile, updateNotesFromFile } from "../fileOperations";
 import { Note } from "../models/note";
-import { Tag } from "../models/tag";
+import { addTag } from "../controllers/tags";
+import { createTags } from "./tags";
 
-let notes: Note[] = [];
+const NOTES_PATH = "data/notes.json";
 
-export const getNote: RequestHandler = (req, res, next) => {
+export const getNote: RequestHandler = async (req, res, next) => {
+  const notes = await readNotesFromFile(NOTES_PATH);
   const note = notes.find((n) => n.id === +req.params.id);
   const noteJSON = JSON.stringify(note);
   if (note) res.status(200).send(`200 ${noteJSON}`);
   else res.sendStatus(404);
 };
 
-export const getAllNotes: RequestHandler = (req, res, next) => {
+export const getAllNotes: RequestHandler = async (req, res, next) => {
+  const notes = await readNotesFromFile(NOTES_PATH);
   res.status(200) ? res.send(notes) : res.sendStatus(400);
 };
 
-export const createNote: RequestHandler = (req, res, next) => {
+export const createNote: RequestHandler = async (req, res, next) => {
+  const notes = await readNotesFromFile(NOTES_PATH);
+
   const date = new Date(Date.now());
   const note = req.body;
   const newNote: Note = {
@@ -26,10 +31,12 @@ export const createNote: RequestHandler = (req, res, next) => {
     tags: note.tags,
     id: Date.now(),
   };
-  notes.push(newNote);
   if (res.status(201)) {
     res.send(`201 Note ID: ${newNote.id}`);
-    updateStorage("./data/tags.json", newNote.tags);
+    await updateNotesFromFile(NOTES_PATH, [...notes, newNote]);
+    if (newNote.tags) {
+      newNote.tags.forEach((tag) => addTag(tag));
+    }
   } else res.sendStatus(400);
 };
 
@@ -45,7 +52,9 @@ const updatedNote = (note: Note, noteId: number) => {
   return newNote;
 };
 
-export const updateNote: RequestHandler = (req, res) => {
+export const updateNote: RequestHandler = async (req, res) => {
+  const notes = await readNotesFromFile(NOTES_PATH);
+
   const index = +req.params.id;
   const noteIndex: number = notes.findIndex((n) => n.id === index);
   if (noteIndex !== -1) {
@@ -54,10 +63,12 @@ export const updateNote: RequestHandler = (req, res) => {
   } else res.sendStatus(404);
 };
 
-export const deleteNote: RequestHandler = (req, res) => {
+export const deleteNote: RequestHandler = async (req, res) => {
+  const notes = await readNotesFromFile(NOTES_PATH);
   const note = notes.find((n: Note) => n.id === +req.params.id);
   if (note) {
-    notes = notes.filter((n: Note) => n.id !== +req.params.id);
+    const newNotes = notes.filter((n: Note) => n.id !== +req.params.id);
+    updateNotesFromFile("./data/notes.json", newNotes);
     res.sendStatus(204);
   } else res.sendStatus(400);
 };

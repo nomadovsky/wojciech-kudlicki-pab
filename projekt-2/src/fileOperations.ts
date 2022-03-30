@@ -1,23 +1,41 @@
-import { Note } from "./models/note";
-
 import fs from "fs";
+import { Note } from "./models/note";
 import { Tag } from "./models/tag";
 
-export async function readStorage(file: string): Promise<void> {
+export async function readNotesFromFile(file: string): Promise<Note[]> {
   try {
     const data = await fs.promises.readFile(file, "utf-8");
+    return JSON.parse(data);
   } catch (err) {
-    console.log(err);
+    throw err;
   }
 }
 
-export async function updateStorage(
+export async function readTagsFromFile(file: string): Promise<Tag[]> {
+  try {
+    const data = await fs.promises.readFile(file, "utf-8");
+    return JSON.parse(data);
+  } catch (err) {
+    throw err;
+  }
+}
+export async function updateNotesFromFile(
   storeFile: string,
-  dataToSave: Note | Tag[] | undefined
+  dataToSave: Note[]
 ): Promise<void> {
   try {
     await fs.promises.writeFile(storeFile, JSON.stringify(dataToSave));
   } catch (err) {
-    console.log(err);
+    throw err;
+  }
+}
+export async function updateTagsFromFile(
+  storeFile: string,
+  dataToSave: Tag[]
+): Promise<void> {
+  try {
+    await fs.promises.writeFile(storeFile, JSON.stringify(dataToSave));
+  } catch (err) {
+    throw err;
   }
 }

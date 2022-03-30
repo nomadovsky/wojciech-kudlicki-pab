@@ -1,9 +1,10 @@
 import { Router } from "express";
+import { createTags, deleteTag, getTag, updateTags } from "../controllers/tags";
 
 const router = Router();
 
-router.get("/", function (req, res) {
-  res.send("Tag page");
-});
+router.post("/", createTags);
+
+router.route("/:id").get(getTag).put(updateTags).delete(deleteTag);
 
 export default router;
