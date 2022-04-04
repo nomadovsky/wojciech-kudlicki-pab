@@ -1,1 +1,12 @@
-[{ "login": "Admin", "password": "qwerty123" }]
+[
+  {
+    "login": "Admin",
+    "password": "qwerty123",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkFkbWluIiwiaWF0IjoxNjQ5MDI0OTQ0fQ.QoQVfqGmdvJ7RcsMxMxeU2P6z62HV7tKV6YLNqVs0Yg"
+  },
+  {
+    "login": "user1",
+    "password": "pass",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6InVzZXIxIiwiaWF0IjoxNjQ5MDI0ODEwfQ.MiOBlQAaNnzU_VvHK-idCv8g2id5Ew167r9ykvDTles"
+  }
+]

@@ -5,6 +5,7 @@ import {
   getNote,
   updateNote,
 } from "../controllers/notes";
+import { authenticateToken } from "../controllers/auth";
 
 const router = Router();
 
