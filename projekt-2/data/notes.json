@@ -1,1 +1,11 @@
-[{"title":"Note title","author":"user1","content":"This is a note content","createDate":"2022-03-31T20:32:47.088Z","tags":[{"name":"anything"}],"id":1648758767088},{"title":"Note title","author":"user1","content":"This is a note content","createDate":"2022-04-01T10:41:24.468Z","tags":[{"name":"anything"}],"id":1648809684468},{"title":"Note admin title","author":"Admin","content":"This is a note content","createDate":"2022-04-03T23:57:18.840Z","tags":[{"name":"anything"}],"id":1649030238840}]
+[
+  {
+    "title": "Note another title",
+    "author": "Admin",
+    "content": "This is a note content",
+    "createDate": "2022-04-06T15:23:02.331Z",
+    "tags": [{ "name": "anything" }],
+    "id": 1649258582331,
+    "isPublic": true
+  }
+]

@@ -27,7 +27,27 @@ export const getAllNotes: RequestHandler = async (req, res, next) => {
     : res.sendStatus(400);
 };
 
-const createdNote = (note: Note, noteAuthor: string, noteId?: number) => {
+export const getUserNotes: RequestHandler = async (req, res, next) => {
+  const notes = await readFromFile<Note>(NOTES_PATH);
+  authenticateToken(req, res);
+  const userName = req.params.userName;
+  res.status(200)
+    ? res.send(
+        notes.filter(
+          (note) =>
+            note.author.toLowerCase === userName.toLowerCase &&
+            note.isPublic === true
+        )
+      )
+    : res.sendStatus(400);
+};
+
+const createdNote = (
+  note: Note,
+  noteAuthor: string,
+  noteId?: number,
+  isPublic: boolean = false
+) => {
   const date = new Date(Date.now());
   const newNote: Note = {
     title: note.title,
@@ -36,13 +56,13 @@ const createdNote = (note: Note, noteAuthor: string, noteId?: number) => {
     createDate: date.toISOString(),
     tags: note.tags,
     id: noteId ?? Date.now(),
+    isPublic: note.isPublic ?? isPublic,
   };
   return newNote;
 };
 
 export const createNote: RequestHandler = async (req, res, next) => {
   const notes = await readFromFile<Note>(NOTES_PATH);
-  // const users = await readUsersFromFile(USERS_PATH);
   const currentUser = authenticateToken(req, res);
   const note = req.body;
   if (!currentUser || !note) throw Error("You can't create a note");

@@ -1,6 +1,6 @@
 import { Request, Response, RequestHandler } from "express";
 import { readUsersFromFile, saveUsersToken } from "../fileOperations";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 const SECRET = "SECRET_CODE_HERE";
 const USERS_PATH = "data/users.json";
